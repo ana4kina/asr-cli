@@ -4,6 +4,8 @@ import wave
 import os
 import time
 import threading
+from tkinter import filedialog
+from src.asr_cli import main
 
 
 class WInterface():
@@ -37,7 +39,9 @@ class WInterface():
             self.path = False
         else:
             self.path = True
-            self.file = tkinter.filedialog.askdirectory()
+            self.file = tkinter.filedialog.askopenfile().name
+            self.button1.destroy()
+            self.button2.destroy()
             self.res_buttom()
 
     def click_recording(self):
@@ -57,7 +61,6 @@ class WInterface():
         self.label = tkinter.Label(text='00:00:00')
         self.label.pack()
         self.recording = False
-        self.root.mainloop()
 
     def click_handler(self):
         if self.recording:
@@ -110,20 +113,20 @@ class WInterface():
         sound_file.setframerate(44100)
         sound_file.writeframes(b''.join(frames))
         sound_file.close()
-        self.file = 'records/recording{i}.wav'
-        self.res_buttom()
-
-    def res_buttom(self):
+        self.file = os.path.realpath(f'records/recording{i}.wav')
         self.button1.destroy()
         self.button2.destroy()
         self.button3.destroy()
+        self.res_buttom()
+
+    def res_buttom(self):
+        self.path = False
         self.button4 = tkinter.Button(
             text="Перевести в текст",
             font=('Arial', 30),
             command=self.click_text()
         )
         self.button4.pack(anchor='center')
-        self.root.mainloop()
 
     def click_text(self):
         if self.path:
@@ -133,7 +136,8 @@ class WInterface():
             self.recognition()
 
     def recognition(self):
-        print("start recognition")
+        print(self.file)
+        cli_entrypoint(args.wav_path)
 
 
 WInterface()
