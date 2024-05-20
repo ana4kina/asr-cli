@@ -5,7 +5,7 @@ import os
 import time
 import threading
 #from tkinter import filedialog
-from src.asr_cli.main import cli_entrypoint
+#from src.asr_cli.main import cli_entrypoint
 from src.preprocessing import visualize
 from src.preprocessing import preprocess_audio
 
@@ -142,7 +142,7 @@ class WInterface():
 
     def recognition(self):
         print(self.file)
-        cli_entrypoint(self.file)
+        #cli_entrypoint(self.file)
         for idx, melspec in enumerate(preprocess_audio()):
             visualize(melspec, SAMPLE_RATE, idx)
 
