@@ -51,8 +51,3 @@ def visualize(S, sr, idx):
     fig.colorbar(img, ax=ax, format='%+2.0f dB')
     ax.set(title='Mel-frequency spectrogram')
     fig.savefig(f'spectrograms/melspectogram-{idx}.png')
-
-
-#for idx, melspec in enumerate(preprocess_audio('/Users/teymur/Desktop/asr-cli/examples/resources/tts-example.wav')):
-#for idx, melspec in enumerate(preprocess_audio()):
-#    visualize(melspec, SAMPLE_RATE, idx)

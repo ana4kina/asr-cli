@@ -26,7 +26,10 @@ def get_requires() -> List[str]:
         "omegaconf",
         "IPython",
         "pyaudio",
-        "matplotlib"
+        "matplotlib",
+        "pyperclip",
+        "pydub", 
+        "pysoundfile"
     ]
 
 

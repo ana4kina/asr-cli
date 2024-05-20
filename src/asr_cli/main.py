@@ -24,4 +24,5 @@ def cli_entrypoint(wav_path: str):
 
     result = infer(wav_path, asr_recognizer, vad_cutter)
     print(result)
+    return result
 

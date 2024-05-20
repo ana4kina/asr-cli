@@ -4,10 +4,10 @@ import wave
 import os
 import time
 import threading
-#from tkinter import filedialog
-#from src.asr_cli.main import cli_entrypoint
-from src.preprocessing import visualize
-from src.preprocessing import preprocess_audio
+from tkinter import filedialog
+from src.asr_cli.main import cli_entrypoint
+from src.preprocessing import visualize, preprocess_audio
+from export import copy_text, save_txt, check_wav
 
 FRAME_SIZE = 2048
 HOP_SIZE = 512
@@ -16,9 +16,9 @@ SAMPLE_RATE = 16_000
 class WInterface():
 
     def __init__(self):
-        self.path = False
         self.recording = False
         self.file = None
+        self.result = None
         self.root = tkinter.Tk()
         self.root.title("Распознавание голоса")
         self.root.geometry("720x256")
@@ -26,7 +26,7 @@ class WInterface():
                               font=("Arial", 50, "bold"))
         label.pack(anchor='n', expand=1)
         self.button1 = tkinter.Button(
-            text="Ввести путь",
+            text="Выбрать файл",
             font=('Arial', 30),
             command=self.click_path
         )
@@ -34,27 +34,17 @@ class WInterface():
         self.button2 = tkinter.Button(
             text="Записать голос",
             font=('Arial', 30),
-            command=self.click_recording
+            command=self.tap_to_rec
         )
         self.button2.pack(anchor='n')
         self.root.mainloop()
 
     def click_path(self):
-        if self.path:
-            self.path = False
-        else:
-            self.path = True
-            self.file = tkinter.filedialog.askopenfile().name
-            self.button1.destroy()
-            self.button2.destroy()
-            self.res_buttom()
-
-    def click_recording(self):
-        if self.recording:
-            self.recording = False
-        else:
-            self.recording = True
-            self.tap_to_rec()
+        self.file = tkinter.filedialog.askopenfile().name
+        check_wav(self.file)
+        self.button1.destroy()
+        self.button2.destroy()
+        self.res_button()
 
     def tap_to_rec(self):
         self.button3 = tkinter.Button(
@@ -122,29 +112,71 @@ class WInterface():
         self.button1.destroy()
         self.button2.destroy()
         self.button3.destroy()
-        self.res_buttom()
+        self.res_button()
 
-    def res_buttom(self):
-        self.path = False
+    def res_button(self):
         self.button4 = tkinter.Button(
             text="Перевести в текст",
             font=('Arial', 30),
-            command=self.click_text()
+            command=self.recognition
         )
         self.button4.pack(anchor='center')
 
-    def click_text(self):
-        if self.path:
-            self.path = False
-        else:
-            self.path = True
-            self.recognition()
-
     def recognition(self):
         print(self.file)
-        #cli_entrypoint(self.file)
-        for idx, melspec in enumerate(preprocess_audio()):
+        for idx, melspec in enumerate(preprocess_audio(self.file)):
             visualize(melspec, SAMPLE_RATE, idx)
+        self.result = cli_entrypoint(self.file)
+        self.button4.destroy()
+        self.copy_button()
+        self.save_txt_button()
+        #self.at_start_button()
 
+    def copy_button(self):
+        self.copy_butt = tkinter.Button(
+            text="Копировать текст",
+            font=('Arial', 30),
+            command=self.click_copy
+        )
+        self.copy_butt.pack(anchor='n')
+
+    def save_txt_button(self):
+        self.txt_button = tkinter.Button(
+            text="Скачать .txt",
+            font=('Arial', 30),
+            command=self.click_txt
+        )
+        self.txt_button.pack(anchor='n')
+
+    def click_copy(self):
+        copy_text(self.result)
+        label = tkinter.Label(self.root, text="Готово!",
+                font=("Arial", 20))
+        label.pack(anchor='n', expand=1)
+
+    def click_txt(self):
+        save_txt(self.result)
+        label = tkinter.Label(self.root, text="Готово!",
+                font=("Arial", 20))
+        label.pack(anchor='n', expand=1)
+
+    #def at_start_button(self):
+    #    self.start_butt = tkinter.Button(
+    #        text="В начало",
+    #        font=('Arial', 30),
+    #        command=self.to_start
+    #    )
+    #    self.start_butt.pack(anchor='n')
+
+    #(self):
+    #    if self.recording:
+    #        self.recording = False
+    #    else:
+    #        self.recording = True
+            #self.copy_butt.destroy()
+            #self.txt_button.destroy()
+            #self.start_butt.destroy()
+            #self.root.destroy()
+            #self.__init__()
 
 WInterface()
