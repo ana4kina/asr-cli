@@ -4,9 +4,14 @@ import wave
 import os
 import time
 import threading
-from tkinter import filedialog
-from src.asr_cli import main
+#from tkinter import filedialog
+from src.asr_cli.main import cli_entrypoint
+from src.preprocessing import visualize
+from src.preprocessing import preprocess_audio
 
+FRAME_SIZE = 2048
+HOP_SIZE = 512
+SAMPLE_RATE = 16_000
 
 class WInterface():
 
@@ -74,7 +79,7 @@ class WInterface():
         stream = audio.open(
             format=pyaudio.paInt16,
             channels=1,
-            rate=44100,
+            rate=SAMPLE_RATE,
             input=True,
             frames_per_buffer=1024,
             # input_device_index = 1
@@ -137,7 +142,9 @@ class WInterface():
 
     def recognition(self):
         print(self.file)
-        cli_entrypoint(args.wav_path)
+        cli_entrypoint(self.file)
+        for idx, melspec in enumerate(preprocess_audio()):
+            visualize(melspec, SAMPLE_RATE, idx)
 
 
 WInterface()
